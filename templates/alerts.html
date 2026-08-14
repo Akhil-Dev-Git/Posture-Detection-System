@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Alert History - Aegis Core{% endblock %}
+
+{% block content %}
+<div class="topbar">
+    <h1 class="page-title">Alert History</h1>
+    <div class="topbar-actions">
+        <div class="fps-badge" id="alert-stats">
+            Total: -- | Acknowledged: --
+        </div>
+    </div>
+</div>
+
+<div class="glass-card">
+    <div class="table-wrapper">
+        <table class="data-table" id="alert-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Timestamp</th>
+                    <th>Detection Type</th>
+                    <th>Confidence</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td colspan="6" class="empty">No security alerts recorded. System is secure.</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    fetchAlerts();
+    setInterval(fetchAlerts, 5000);
+
+    async function fetchAlerts() {
+        try {
+            const resp = await fetch('/api/alerts');
+            const alerts = await resp.json();
+            renderAlerts(alerts);
+        } catch (err) {
+            console.error('Failed to fetch alerts:', err);
+        }
+    }
+
+    function renderAlerts(alerts) {
+        const tbody = document.querySelector('#alert-table tbody');
+        if (!alerts.length) return;
+
+        tbody.innerHTML = alerts.reverse().map(a => `
+            <tr class="${a.status === 'unacknowledged' ? 'unack' : ''}">
+                <td style="color: var(--text-muted); font-family: 'Outfit', sans-serif;">#${a.id.toString().padStart(4, '0')}</td>
+                <td>${new Date(a.timestamp).toLocaleString()}</td>
+                <td style="font-weight: 500;">Violence Detected</td>
+                <td style="font-family: 'Outfit', sans-serif;">${(a.probability * 100).toFixed(1)}%</td>
+                <td>
+                    <span class="badge ${a.status}">${a.status}</span>
+                </td>
+                <td>
+                    ${a.status === 'unacknowledged' ?
+                        `<button class="btn btn-outline" onclick="acknowledge(${a.id})" style="padding: 0.25rem 0.75rem; font-size: 0.75rem;">Acknowledge</button>` 
+                        : '<span style="color: var(--text-muted);">—</span>'}
+                </td>
+            </tr>
+        `).join('');
+
+        const unack = alerts.filter(a => a.status === 'unacknowledged').length;
+        document.getElementById('alert-stats').innerHTML =
+            `<span style="color: var(--text-secondary)">Total:</span> ${alerts.length} &nbsp;|&nbsp; ` +
+            `<span style="color: var(--status-danger)">Unacknowledged:</span> ${unack}`;
+    }
+
+    window.acknowledge = async function(id) {
+        await fetch(`/api/alerts/${id}/acknowledge`, {method: 'POST'});
+        fetchAlerts();
+    };
+});
+</script>
+{% endblock %}

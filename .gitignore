@@ -1,0 +1,27 @@
+# Virtual environments
+venv/
+venv_new/
+.env
+
+# Cache
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Databases
+*.db
+*.sqlite3
+
+# Models and Large Files
+*.pt
+*.h5
+*.pkl
+models/
+.mediapipe_models/
+
+# Logs
+logs/
+*.log
+
+# OS generated files
+.DS_Store

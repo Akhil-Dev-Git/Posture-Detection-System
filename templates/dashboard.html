@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - Aegis Core{% endblock %}
+
+{% block content %}
+<div class="topbar">
+    <h1 class="page-title">Live Surveillance</h1>
+    <div class="topbar-actions">
+        <div class="fps-badge">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+            <span id="nav-fps">FPS: --</span>
+        </div>
+    </div>
+</div>
+
+<!-- KPI Cards -->
+<div class="kpi-grid">
+    <div class="glass-card kpi-card">
+        <div class="kpi-icon primary">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+        </div>
+        <div class="kpi-content">
+            <span class="kpi-label">Threat Status</span>
+            <span class="kpi-value" id="threat-level" style="color: var(--status-secure);">0%</span>
+        </div>
+    </div>
+    <div class="glass-card kpi-card">
+        <div class="kpi-icon warning">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
+        </div>
+        <div class="kpi-content">
+            <span class="kpi-label">Active Posture</span>
+            <span class="kpi-value" id="posture-display">SCANNING</span>
+        </div>
+    </div>
+    <div class="glass-card kpi-card">
+        <div class="kpi-icon primary">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+        </div>
+        <div class="kpi-content">
+            <span class="kpi-label">Current Action</span>
+            <span class="kpi-value" id="action-display">ANALYZING</span>
+        </div>
+    </div>
+    <div class="glass-card kpi-card">
+        <div class="kpi-icon danger">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+        </div>
+        <div class="kpi-content">
+            <span class="kpi-label">Total Alerts</span>
+            <span class="kpi-value" id="alert-count">0</span>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-layout">
+    <!-- Main Video Section -->
+    <div class="video-section">
+        <div class="glass-card" style="padding: 1rem;">
+            <div class="card-header" style="margin-bottom: 0.5rem;">
+                <h2 class="card-title">Camera Feed [01]</h2>
+                <div id="violence-status" class="status-dot secure"></div>
+            </div>
+            <div class="video-wrapper">
+                <div class="video-tag">LIVE FEED</div>
+                <img id="live-video" src="/video_feed" alt="Live Video Stream">
+                <div class="video-overlay"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Telemetry Section -->
+    <div class="telemetry-section">
+        <div class="glass-card">
+            <div class="card-header">
+                <h2 class="card-title">Biometric Scanner</h2>
+            </div>
+            <div class="biometric-list">
+                <div class="biometric-item">
+                    <span class="bio-label">Skeleton Map</span>
+                    <span class="bio-value secure">17/17 NODES</span>
+                </div>
+                <div class="biometric-item">
+                    <span class="bio-label">Geometric Analysis</span>
+                    <span class="bio-value highlight">VERIFIED</span>
+                </div>
+                <div class="biometric-item">
+                    <span class="bio-label">Contraband Scan</span>
+                    <span class="bio-value secure">CLEAR</span>
+                </div>
+                <div class="biometric-item">
+                    <span class="bio-label">Behavioral Matrix</span>
+                    <span class="bio-value warning">ACTIVE</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <div class="card-header">
+                <h2 class="card-title">Activity Telemetry</h2>
+            </div>
+            <div class="chart-container">
+                <canvas id="activity-chart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    startPolling();
+});
+</script>
+{% endblock %}
